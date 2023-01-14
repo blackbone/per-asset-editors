@@ -1,0 +1,17 @@
+{
+  "name": "com.blackbone.per-asset-editors",
+  "displayName": "[B] Per Asset Editors",
+  "version": "1.0.0",
+  "unity": "2020.3",
+  "keywords": [
+    "Unity",
+    "Editor",
+    "Scripts",
+    "Workflow"
+  ],
+  "description": "Editor extension to customize inspectors on per-asset basis.\nAlso supports editors for text/binary serialized assets.",
+  "author": {
+    "name": "Dmytro Osipov",
+    "email": "blackboneworks@gmail.com"
+  }
+}
