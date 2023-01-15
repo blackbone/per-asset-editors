@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace B.PerAssetEditors
 {
-    public abstract class CustomAssetInspector<TAsset> : CustomAssetInspector where TAsset: Object
+    public abstract class OverrideEditor<TAsset> : OverrideEditor where TAsset: Object
     {
         protected TAsset Target => RawTarget as TAsset;
 

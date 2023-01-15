@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace B.PerAssetEditors
 {
-    public abstract class JsonTextAssetSerializedType<TData> : CustomAssetInspector<TextAsset> where TData : class, new()
+    public abstract class JsonTextAssetOverrideEditor<TData> : OverrideEditor<TextAsset> where TData : class, new()
     {
         private static JsonSerializerSettings jsonSettings;
 

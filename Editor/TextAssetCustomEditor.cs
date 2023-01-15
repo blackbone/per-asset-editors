@@ -5,57 +5,71 @@ using UnityEngine;
 namespace B.PerAssetEditors
 {
     [CustomEditor(typeof(TextAsset), true)]
-    [Serializable]
-    public class TextAssetCustomEditor : Editor
+    public sealed class TextAssetCustomEditor : BaseCustomEditor
     {
-        private static readonly Type TextAssetDefaultInspector = typeof(Editor).Assembly.GetType("UnityEditor.TextAssetInspector");
+        protected override Type DefaultEditorType => typeof(Editor).Assembly.GetType("UnityEditor.TextAssetInspector");
+    }
+    
+    [CustomEditor(typeof(DefaultAsset), true)]
+    public sealed class DefaultAssetCustomEditor : BaseCustomEditor
+    {
+        protected override Type DefaultEditorType => typeof(Editor).Assembly.GetType("UnityEditor.DefaultAssetInspector");
+
+    }
+
+    public abstract class BaseCustomEditor : Editor
+    {
         private static readonly GUIContent[] ToolbarContents = {
             new("Custom"),
             new("Raw")
         };
 
-        private Editor textAssetInspector;
-        private CustomAssetInspector customAssetInspector;
+        protected abstract Type DefaultEditorType { get; }
+        
+        private Editor defaultEditor;
+        private OverrideEditor customInspector;
         [SerializeField] private int drawMode;
 
         private void OnEnable()
         {
-            textAssetInspector ??= CreateEditor(target, TextAssetDefaultInspector);
-            customAssetInspector = DefaultAssetCustomInspectorConfiguration.Instance.GetInspector(target);
-            customAssetInspector?.Enable(target);
+            defaultEditor ??= CreateEditor(target, DefaultEditorType);
+            customInspector = OverrideEditorSettings.instance.GetOverrideEditor(target);
+            customInspector?.Enable(target);
         }
 
         private void OnDisable()
         {
-            DestroyImmediate(textAssetInspector);
-            customAssetInspector?.Disable();
-            customAssetInspector = null;
+            customInspector?.Disable();
+            customInspector = null;
+            DestroyImmediate(defaultEditor);
         }
 
         public override void OnInspectorGUI()
         {
-            var enabled = GUI.enabled;
-            GUI.enabled = true;
-            if (customAssetInspector == null)
+            if (customInspector == null)
             {
-                textAssetInspector.OnInspectorGUI();
+                if (defaultEditor != null)
+                    defaultEditor.OnInspectorGUI();
                 return;
             }
-            
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
-            drawMode = GUILayout.SelectionGrid(drawMode, ToolbarContents, ToolbarContents.Length, GUILayout.ExpandWidth(true));
-            EditorGUILayout.EndHorizontal();
 
-            switch (drawMode)
+            var enabled = GUI.enabled;
+            GUI.enabled = true;
             {
-                case 0:
-                    customAssetInspector.OnInspectorGUI();
-                    break;
-                case 1:
-                    textAssetInspector.OnInspectorGUI();
-                    break;
-            }
+                EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
+                drawMode = GUILayout.SelectionGrid(drawMode, ToolbarContents, ToolbarContents.Length, EditorStyles.toolbarButton, GUILayout.ExpandWidth(true));
+                EditorGUILayout.EndHorizontal();
             
+                switch (drawMode)
+                {
+                    case 0:
+                        customInspector.OnInspectorGUI();
+                        break;
+                    case 1:
+                        defaultEditor.OnInspectorGUI();
+                        break;
+                }
+            }
             GUI.enabled = enabled;
         }
     }

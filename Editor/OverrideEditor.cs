@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace B.PerAssetEditors
 {
-    public abstract class CustomAssetInspector
+    public abstract class OverrideEditor
     {
         protected Object RawTarget { get; private set; }
 
