@@ -1,4 +1,4 @@
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor
 {
     public class CustomAssetTypeInspector
     {

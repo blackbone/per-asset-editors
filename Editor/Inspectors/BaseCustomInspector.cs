@@ -1,23 +1,11 @@
 using System;
+using OverrideEditors.Editor.Editors;
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor.Inspectors
 {
-    [CustomEditor(typeof(TextAsset), true)]
-    public sealed class TextAssetCustomEditor : BaseCustomEditor
-    {
-        protected override Type DefaultEditorType => typeof(Editor).Assembly.GetType("UnityEditor.TextAssetInspector");
-    }
-    
-    [CustomEditor(typeof(DefaultAsset), true)]
-    public sealed class DefaultAssetCustomEditor : BaseCustomEditor
-    {
-        protected override Type DefaultEditorType => typeof(Editor).Assembly.GetType("UnityEditor.DefaultAssetInspector");
-
-    }
-
-    public abstract class BaseCustomEditor : Editor
+    public abstract class BaseCustomInspector : UnityEditor.Editor
     {
         private static readonly GUIContent[] ToolbarContents = {
             new("Custom"),
@@ -26,7 +14,7 @@ namespace B.PerAssetEditors
 
         protected abstract Type DefaultEditorType { get; }
         
-        private Editor defaultEditor;
+        private UnityEditor.Editor defaultEditor;
         private OverrideEditor customInspector;
         [SerializeField] private int drawMode;
 

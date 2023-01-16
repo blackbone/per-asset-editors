@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor.Configurations
 {
     [Serializable]
     internal sealed class AssetTypeConfiguration : Configuration

@@ -1,12 +1,15 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Scripting;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor.Editors
 {
+    [Preserve]
     public sealed class FolderReadmeEditor : OverrideEditor<DefaultAsset>
     {
-        private const string ReadmeFileName = "readme.txt";
+        private const string ReadmeFileName = "readme~";
         private static readonly GUILayoutOption[] Options = {
             GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)
         };
@@ -60,7 +63,7 @@ namespace B.PerAssetEditors
                 existsPreviously = true;
             }
             // or file has been updated externally
-            else if (lastFileVersion < readmeFileInfo.LastWriteTime.Ticks)
+            else if (readmeFileInfo.Exists && lastFileVersion < readmeFileInfo.LastWriteTime.Ticks)
             {
                 readme = File.ReadAllText(readmePath);
                 lastFileVersion = new FileInfo(readmePath).LastWriteTime.Ticks;
@@ -86,11 +89,20 @@ namespace B.PerAssetEditors
         {
             if (!notSaved && !force)
                 return;
+
+            var hasFileContents = !string.IsNullOrEmpty(readme);
+            if (hasFileContents)
+            {
+                File.WriteAllText(readmePath, readme);
+                lastFileVersion = new FileInfo(readmePath).LastWriteTime.Ticks;
+            }
+            else
+            {
+                File.Delete(readmePath);
+                lastFileVersion = -1;
+            }
             
-            File.WriteAllText(readmePath, readme);
-            lastFileVersion = new FileInfo(readmePath).LastWriteTime.Ticks;
-            AssetDatabase.ImportAsset(readmePath);
-            existsPreviously = true;
+            existsPreviously = hasFileContents;
             notSaved = false;
         }
     }

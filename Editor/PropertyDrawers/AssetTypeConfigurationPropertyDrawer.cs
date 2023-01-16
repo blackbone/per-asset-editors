@@ -1,7 +1,8 @@
+using OverrideEditors.Editor.Configurations;
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors.PropertyDrawers
+namespace OverrideEditors.Editor.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(AssetTypeConfiguration))]
     public sealed class AssetTypeConfigurationPropertyDrawer : ConfigurationPropertyDrawer

@@ -1,8 +1,10 @@
 using System;
+using OverrideEditors.Editor.Configurations;
+using OverrideEditors.Editor.Editors;
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor
 {
     [FilePath("ProjectSettings/" + nameof(OverrideEditorSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class OverrideEditorSettings : ScriptableSingleton<OverrideEditorSettings>
@@ -19,39 +21,50 @@ namespace B.PerAssetEditors
         public OverrideEditor GetOverrideEditor(UnityEngine.Object target)
         {
             // per asset is 1st priority
-            if (assetConfigurations != null)
-            {
-                foreach (var assetConfiguration in assetConfigurations)
-                {
-                    if (assetConfiguration.Asset == null)
-                        continue;
-                        
-                    if (assetConfiguration.Asset != target)
-                        continue;
-                    
-                    return Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
-                }
-            }
-            
+            if (TryGetPerAssetOverrideEditor(target, out var editor))
+                return editor;
+
             // per pattern is 2nd priority
+            // TODO [Dmitrii Osipov]
             
             // per type is 3rd priority
-            if (assetTypeConfigurations != null)
+            return TryGetPerAssetTypeOverrideEditor(target, out editor) ? editor : null;
+        }
+
+        private bool TryGetPerAssetOverrideEditor(UnityEngine.Object target, out OverrideEditor editor)
+        {
+            editor = null;
+            if (assetConfigurations == null)
+                return false;
+
+            foreach (var assetConfiguration in assetConfigurations)
             {
-                foreach (var assetTypeConfiguration in assetTypeConfigurations)
-                {
-                    var assetType = assetTypeConfiguration.AssetType;
-                    if (assetType == null)
-                        continue;
-
-                    if (!assetType.IsInstanceOfType(target))
-                        continue;
-                    
-                    return Activator.CreateInstance(assetTypeConfiguration.EditorType) as OverrideEditor;
-                }
+                if (assetConfiguration.Asset != target)
+                    continue;
+                
+                editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
+                return true;
             }
+            
+            return false;
+        }
+        
+        private bool TryGetPerAssetTypeOverrideEditor(UnityEngine.Object target, out OverrideEditor editor)
+        {
+            editor = null;
+            if (assetConfigurations == null)
+                return false;
 
-            return null;
+            foreach (var assetTypeConfiguration in assetTypeConfigurations)
+            {
+                if (!(assetTypeConfiguration.AssetType?.IsInstanceOfType(target) ?? false))
+                    continue;
+                
+                editor =  Activator.CreateInstance(assetTypeConfiguration.EditorType) as OverrideEditor;
+                return true;
+            }
+            
+            return false;
         }
     }
 }

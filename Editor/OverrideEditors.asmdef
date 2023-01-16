@@ -1,6 +1,6 @@
 {
-    "name": "DefaultAssetEditor",
-    "rootNamespace": "B.PerAssetEditors",
+    "name": "OverrideEditors",
+    "rootNamespace": "OverrideEditors",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

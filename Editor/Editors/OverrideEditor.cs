@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor.Editors
 {
     public abstract class OverrideEditor
     {

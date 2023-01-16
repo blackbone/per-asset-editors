@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor
 {
     internal static class TypeSerializer
     {

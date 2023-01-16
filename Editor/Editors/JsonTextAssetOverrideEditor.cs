@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor.Editors
 {
     public abstract class JsonTextAssetOverrideEditor<TData> : OverrideEditor<TextAsset> where TData : class, new()
     {

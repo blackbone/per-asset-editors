@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace B.PerAssetEditors
+namespace OverrideEditors.Editor
 {
     public sealed class OverrideEditorSettingsProvider : SettingsProvider
     {

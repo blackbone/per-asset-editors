@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using OverrideEditors.Editor.Editors;
 using UnityEditor;
 using UnityEngine;
 
-namespace B.PerAssetEditors.PropertyDrawers
+namespace OverrideEditors.Editor.PropertyDrawers
 {
     [UsedImplicitly]
     public abstract class ConfigurationPropertyDrawer : PropertyDrawer
