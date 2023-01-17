@@ -31,12 +31,13 @@ namespace OverrideEditors.Editor
             // generation options
             using var _ = new EditorGUILayout.VerticalScope("box");
 
-            settingsSerializedObject.UpdateIfRequiredOrScript();
-
-            EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAsset));
-            EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAssetType));
-
-            settingsSerializedObject.ApplyModifiedProperties();
+            if (settingsSerializedObject != null)
+            {
+                settingsSerializedObject.UpdateIfRequiredOrScript();
+                EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAsset));
+                EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAssetType));
+                settingsSerializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }
