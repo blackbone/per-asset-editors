@@ -17,6 +17,8 @@ namespace OverrideEditors.Editor
         
         [SerializeField] private AssetConfiguration[] assetConfigurations;
         [SerializeField] private AssetTypeConfiguration[] assetTypeConfigurations;
+
+        internal void Save() => Save(true);
         
         public OverrideEditor GetOverrideEditor(UnityEngine.Object target)
         {
@@ -39,9 +41,12 @@ namespace OverrideEditors.Editor
 
             foreach (var assetConfiguration in assetConfigurations)
             {
+                if (assetConfiguration.EditorType == null)
+                    continue;
+
                 if (assetConfiguration.Asset != target)
                     continue;
-                
+
                 editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
                 return true;
             }
@@ -57,6 +62,9 @@ namespace OverrideEditors.Editor
 
             foreach (var assetTypeConfiguration in assetTypeConfigurations)
             {
+                if (assetTypeConfiguration.EditorType == null)
+                    continue;
+
                 if (!(assetTypeConfiguration.AssetType?.IsInstanceOfType(target) ?? false))
                     continue;
                 

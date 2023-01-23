@@ -33,10 +33,13 @@ namespace OverrideEditors.Editor
 
             if (settingsSerializedObject != null)
             {
-                settingsSerializedObject.UpdateIfRequiredOrScript();
-                EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAsset));
-                EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAssetType));
-                settingsSerializedObject.ApplyModifiedProperties();
+                EditorGUI.BeginChangeCheck();
+                {
+                    EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAsset));
+                    EditorGUILayout.PropertyField(settingsSerializedObject.FindProperty(OverrideEditorSettings.Names.PerAssetType));
+                }
+                if (EditorGUI.EndChangeCheck() || settingsSerializedObject.ApplyModifiedProperties())
+                    OverrideEditorSettings.instance.Save();
             }
         }
     }
