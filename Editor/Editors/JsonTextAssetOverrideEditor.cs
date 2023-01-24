@@ -40,16 +40,31 @@ namespace OverrideEditors.Editor.Editors
 
         protected virtual bool TryDeserialize(TextAsset asset, out TData data)
         {
-            data = JsonConvert.DeserializeObject<TData>(asset.text);
-            return true;
+            try
+            {
+                data = JsonConvert.DeserializeObject<TData>(asset.text);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                data = default;
+                return false;
+            }
         }
 
-        protected virtual bool TrySerialize(TData data, TextAsset asset)
+        protected virtual bool Serialize(TData data, TextAsset asset)
         {
             data ??= new TData();
+            var path = AssetDatabase.GetAssetPath(asset);
+            var previousText = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
             var text = JsonConvert.SerializeObject(data, JsonSettings);
-            File.WriteAllText(AssetDatabase.GetAssetPath(asset), text);
-            return true;
+            if (previousText != text)
+            {
+                File.WriteAllText(path, text);
+                return true;
+            }
+            return false;
         }
 
         protected override void ApplyChangesInternal()
@@ -59,10 +74,8 @@ namespace OverrideEditors.Editor.Editors
             serializedObject.ApplyModifiedProperties();
             Data = dataWrapper.data;
             
-            if (!TrySerialize(Data, Target))
-                throw new SerializationException("Failed to serialize data");
-            
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Target));
+            if (Serialize(Data, Target))
+                AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Target));
         }
 
         protected sealed override void EnableInternal()
