@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OverrideEditors.Editor.PropertyDrawers
 {
-    [CustomPropertyDrawer(typeof(AssetConfiguration))]
+    [CustomPropertyDrawer(typeof(AssetLinkConfiguration))]
     public sealed class AssetConfigurationPropertyDrawer : ConfigurationPropertyDrawer
     {
         protected override float GetContentHeight() => EditorGUIUtility.singleLineHeight;

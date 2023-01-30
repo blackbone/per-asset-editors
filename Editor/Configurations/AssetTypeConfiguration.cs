@@ -7,7 +7,6 @@ namespace OverrideEditors.Editor.Configurations
     internal sealed class AssetTypeConfiguration : Configuration
     {
         [SerializeField] private string assetTypeData;
-
         [NonSerialized] private Type assetType;
 
         public Type AssetType => assetType;

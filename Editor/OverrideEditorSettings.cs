@@ -12,10 +12,12 @@ namespace OverrideEditors.Editor
         internal static class Names
         {
             public static string PerAsset => nameof(assetConfigurations);
+            public static string PerPattern => nameof(assetPatternConfigurations);
             public static string PerAssetType => nameof(assetTypeConfigurations);
         }
         
-        [SerializeField] private AssetConfiguration[] assetConfigurations;
+        [SerializeField] private AssetLinkConfiguration[] assetConfigurations;
+        [SerializeField] private AssetPatternConfiguration[] assetPatternConfigurations;
         [SerializeField] private AssetTypeConfiguration[] assetTypeConfigurations;
 
         internal void Save() => Save(true);
@@ -27,7 +29,8 @@ namespace OverrideEditors.Editor
                 return editor;
 
             // per pattern is 2nd priority
-            // TODO [Dmitrii Osipov]
+            if (TryGetPatternOverrideEditor(target, out editor))
+                return editor;
             
             // per type is 3rd priority
             return TryGetPerAssetTypeOverrideEditor(target, out editor) ? editor : null;
@@ -45,6 +48,28 @@ namespace OverrideEditors.Editor
                     continue;
 
                 if (assetConfiguration.Asset != target)
+                    continue;
+
+                editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
+                return true;
+            }
+            
+            return false;
+        }
+        
+        private bool TryGetPatternOverrideEditor(UnityEngine.Object target, out OverrideEditor editor)
+        {
+            editor = null;
+            if (assetConfigurations == null)
+                return false;
+            
+            var path = AssetDatabase.GetAssetPath(target);
+            foreach (var assetConfiguration in assetPatternConfigurations)
+            {
+                if (assetConfiguration.EditorType == null)
+                    continue;
+
+                if (!assetConfiguration.Regex.IsMatch(path))
                     continue;
 
                 editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace OverrideEditors.Editor.Configurations
 {
     [Serializable]
-    internal sealed class AssetConfiguration : Configuration
+    internal sealed class AssetLinkConfiguration : Configuration
     {
         [SerializeField] private UnityEngine.Object asset;
 

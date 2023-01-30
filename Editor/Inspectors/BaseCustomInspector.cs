@@ -54,7 +54,8 @@ namespace OverrideEditors.Editor.Inspectors
                         customInspector.OnInspectorGUI();
                         break;
                     case 1:
-                        defaultEditor.OnInspectorGUI();
+                        if (defaultEditor != null)
+                            defaultEditor.OnInspectorGUI();
                         break;
                 }
             }

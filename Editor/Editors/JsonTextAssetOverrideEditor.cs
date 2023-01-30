@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace OverrideEditors.Editor.Editors
 {
-    public abstract class JsonTextAssetOverrideEditor<TData> : OverrideEditor<TextAsset> where TData : class, new()
+    public abstract class JsonTextAssetOverrideEditor<TData> : OverrideEditor<TextAsset>
     {
         private static JsonSerializerSettings jsonSettings;
 
@@ -55,10 +55,20 @@ namespace OverrideEditors.Editor.Editors
 
         protected virtual bool Serialize(TData data, TextAsset asset)
         {
-            data ??= new TData();
+            data ??= Activator.CreateInstance<TData>();
             var path = AssetDatabase.GetAssetPath(asset);
             var previousText = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
-            var text = JsonConvert.SerializeObject(data, JsonSettings);
+            string text;
+            try
+            {
+                text = JsonConvert.SerializeObject(data, JsonSettings);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return false;
+            }
+            
             if (previousText != text)
             {
                 File.WriteAllText(path, text);
@@ -70,10 +80,14 @@ namespace OverrideEditors.Editor.Editors
         protected override void ApplyChangesInternal()
         {
             base.ApplyChangesInternal();
+
+            if (serializedObject != null)
+                serializedObject.ApplyModifiedProperties();
+
+            if (dataWrapper == null)
+                return;
             
-            serializedObject.ApplyModifiedProperties();
             Data = dataWrapper.data;
-            
             if (Serialize(Data, Target))
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Target));
         }
@@ -111,14 +125,22 @@ namespace OverrideEditors.Editor.Editors
         protected override bool OnInspectorGUIInternal()
         {
             EditorGUI.BeginChangeCheck();
-            var endProperty = dataProperty.GetEndProperty();
-            var nextProperty = dataProperty.Copy();
-            nextProperty.NextVisible(true);
-
-            while (nextProperty.propertyPath != endProperty.propertyPath)
+            if (dataProperty.isArray)
             {
-                EditorGUILayout.PropertyField(nextProperty);
-                nextProperty.NextVisible(false);
+                dataProperty.isExpanded = true;
+                EditorGUILayout.PropertyField(dataProperty);
+            }
+            else
+            {
+                var endProperty = dataProperty.GetEndProperty();
+                var nextProperty = dataProperty.Copy();
+                nextProperty.NextVisible(true);
+            
+                while (nextProperty.propertyPath != endProperty.propertyPath)
+                {
+                    EditorGUILayout.PropertyField(nextProperty);
+                    nextProperty.NextVisible(false);
+                }
             }
             return EditorGUI.EndChangeCheck();
         }
