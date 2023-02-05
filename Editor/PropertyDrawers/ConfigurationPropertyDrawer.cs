@@ -13,9 +13,12 @@ namespace OverrideEditors.Editor.PropertyDrawers
     {
         private static readonly GUIContent None = new("None");
         private static readonly Dictionary<Type, GUIContent> Contents = new();
-        private static Dictionary<Type, Type[]> typesCache = new();
+        private static readonly Dictionary<Type, Type[]> typesCache = new();
 
-        public sealed override float GetPropertyHeight(SerializedProperty property, GUIContent label) => GetContentHeight() + EditorGUIUtility.singleLineHeight;
+        public sealed override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return GetContentHeight() + EditorGUIUtility.singleLineHeight;
+        }
 
         public sealed override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -37,7 +40,7 @@ namespace OverrideEditors.Editor.PropertyDrawers
             if (EditorGUI.DropdownButton(position, selected.Item2, FocusType.Passive))
                 ShowDropdown<T>(selected.Item1, typeDataProperty);
         }
-        
+
         private void ShowDropdown<T>(Type selectedType, SerializedProperty dataProperty)
         {
             var menu = new GenericMenu();
@@ -47,13 +50,11 @@ namespace OverrideEditors.Editor.PropertyDrawers
             else menu.AddItem(None, false, OnMenuItemClick, null);
 
             if (!typesCache.TryGetValue(typeof(T), out var types))
-            {
                 typesCache[typeof(T)] = types = TypeCache.GetTypesDerivedFrom(typeof(T))
-                                                      .Where(type => !type.IsAbstract)
-                                                      .Where(type => !type.IsInterface)
-                                                      .OrderBy(type => type.FullName)
-                                                      .ToArray();
-            }
+                                                         .Where(type => !type.IsAbstract)
+                                                         .Where(type => !type.IsInterface)
+                                                         .OrderBy(type => type.FullName)
+                                                         .ToArray();
 
             // type selection
             foreach (var type in types)

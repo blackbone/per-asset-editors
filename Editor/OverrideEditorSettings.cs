@@ -9,19 +9,15 @@ namespace OverrideEditors.Editor
     [FilePath("ProjectSettings/" + nameof(OverrideEditorSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
     internal sealed class OverrideEditorSettings : ScriptableSingleton<OverrideEditorSettings>
     {
-        internal static class Names
-        {
-            public static string PerAsset => nameof(assetConfigurations);
-            public static string PerPattern => nameof(assetPatternConfigurations);
-            public static string PerAssetType => nameof(assetTypeConfigurations);
-        }
-        
         [SerializeField] private AssetLinkConfiguration[] assetConfigurations;
         [SerializeField] private AssetPatternConfiguration[] assetPatternConfigurations;
         [SerializeField] private AssetTypeConfiguration[] assetTypeConfigurations;
 
-        internal void Save() => Save(true);
-        
+        internal void Save()
+        {
+            Save(true);
+        }
+
         public OverrideEditor GetOverrideEditor(UnityEngine.Object target)
         {
             // per asset is 1st priority
@@ -31,7 +27,7 @@ namespace OverrideEditors.Editor
             // per pattern is 2nd priority
             if (TryGetPatternOverrideEditor(target, out editor))
                 return editor;
-            
+
             // per type is 3rd priority
             return TryGetPerAssetTypeOverrideEditor(target, out editor) ? editor : null;
         }
@@ -50,19 +46,19 @@ namespace OverrideEditors.Editor
                 if (assetConfiguration.Asset != target)
                     continue;
 
-                editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
+                editor = Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
                 return true;
             }
-            
+
             return false;
         }
-        
+
         private bool TryGetPatternOverrideEditor(UnityEngine.Object target, out OverrideEditor editor)
         {
             editor = null;
             if (assetConfigurations == null)
                 return false;
-            
+
             var path = AssetDatabase.GetAssetPath(target);
             foreach (var assetConfiguration in assetPatternConfigurations)
             {
@@ -72,13 +68,13 @@ namespace OverrideEditors.Editor
                 if (!assetConfiguration.Regex.IsMatch(path))
                     continue;
 
-                editor =  Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
+                editor = Activator.CreateInstance(assetConfiguration.EditorType) as OverrideEditor;
                 return true;
             }
-            
+
             return false;
         }
-        
+
         private bool TryGetPerAssetTypeOverrideEditor(UnityEngine.Object target, out OverrideEditor editor)
         {
             editor = null;
@@ -92,12 +88,19 @@ namespace OverrideEditors.Editor
 
                 if (!(assetTypeConfiguration.AssetType?.IsInstanceOfType(target) ?? false))
                     continue;
-                
-                editor =  Activator.CreateInstance(assetTypeConfiguration.EditorType) as OverrideEditor;
+
+                editor = Activator.CreateInstance(assetTypeConfiguration.EditorType) as OverrideEditor;
                 return true;
             }
-            
+
             return false;
+        }
+
+        internal static class Names
+        {
+            public static string PerAsset => nameof(assetConfigurations);
+            public static string PerPattern => nameof(assetPatternConfigurations);
+            public static string PerAssetType => nameof(assetTypeConfigurations);
         }
     }
 }

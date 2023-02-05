@@ -7,16 +7,18 @@ namespace OverrideEditors.Editor.Inspectors
 {
     public abstract class BaseCustomInspector : UnityEditor.Editor
     {
-        private static readonly GUIContent[] ToolbarContents = {
+        private static readonly GUIContent[] ToolbarContents =
+        {
             new("Custom"),
             new("Raw")
         };
 
-        protected abstract Type DefaultEditorType { get; }
-        
-        private UnityEditor.Editor defaultEditor;
-        private OverrideEditor customInspector;
         [SerializeField] private int drawMode;
+        private OverrideEditor customInspector;
+
+        private UnityEditor.Editor defaultEditor;
+
+        protected abstract Type DefaultEditorType { get; }
 
         private void OnEnable()
         {
@@ -47,7 +49,7 @@ namespace OverrideEditors.Editor.Inspectors
                 EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
                 drawMode = GUILayout.SelectionGrid(drawMode, ToolbarContents, ToolbarContents.Length, EditorStyles.toolbarButton, GUILayout.ExpandWidth(true));
                 EditorGUILayout.EndHorizontal();
-            
+
                 switch (drawMode)
                 {
                     case 0:

@@ -10,6 +10,10 @@ namespace OverrideEditors.Editor.Editors
     public abstract class JsonTextAssetOverrideEditor<TData> : OverrideEditor<TextAsset>
     {
         private static JsonSerializerSettings jsonSettings;
+        private SerializedProperty dataProperty;
+
+        private GenericDataWrapperScriptableObject<TData> dataWrapper;
+        private SerializedObject serializedObject;
 
         private static JsonSerializerSettings JsonSettings
         {
@@ -17,26 +21,22 @@ namespace OverrideEditors.Editor.Editors
             {
                 if (jsonSettings != null)
                     return jsonSettings;
-
+                
                 if (JsonConvert.DefaultSettings != null)
                     jsonSettings = JsonConvert.DefaultSettings();
-                
+
                 if (jsonSettings == null)
                     throw new Exception();
-                
+
                 jsonSettings.NullValueHandling = NullValueHandling.Ignore;
                 jsonSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
                 jsonSettings.Formatting = Formatting.Indented;
                 return jsonSettings;
             }
         }
-        
+
         protected TData Data { get; private set; }
         protected abstract Type DataWrapperType { get; }
-
-        private GenericDataWrapperScriptableObject<TData> dataWrapper;
-        private SerializedObject serializedObject;
-        private SerializedProperty dataProperty;
 
         protected virtual bool TryDeserialize(TextAsset asset, out TData data)
         {
@@ -68,12 +68,13 @@ namespace OverrideEditors.Editor.Editors
                 Debug.LogException(e);
                 return false;
             }
-            
+
             if (previousText != text)
             {
                 File.WriteAllText(path, text);
                 return true;
             }
+
             return false;
         }
 
@@ -86,7 +87,7 @@ namespace OverrideEditors.Editor.Editors
 
             if (dataWrapper == null)
                 return;
-            
+
             Data = dataWrapper.data;
             if (Serialize(Data, Target))
                 AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(Target));
@@ -95,15 +96,18 @@ namespace OverrideEditors.Editor.Editors
         protected sealed override void EnableInternal()
         {
             base.EnableInternal();
-            
+
             if (!TryDeserialize(Target, out var data))
                 throw new SerializationException("Failed to deserialize data");
 
             Data = data;
-            
+
             dataWrapper = ScriptableObject.CreateInstance(DataWrapperType) as GenericDataWrapperScriptableObject<TData>;
-            dataWrapper.data = data;
+            if (dataWrapper == null)
+                throw new InvalidCastException("Something wend wrong creating data wrapper scriptable object");
             
+            dataWrapper.data = data;
+
             serializedObject = new SerializedObject(dataWrapper);
             dataProperty = serializedObject.FindProperty(nameof(GenericDataWrapperScriptableObject<TData>.data));
         }
@@ -111,7 +115,7 @@ namespace OverrideEditors.Editor.Editors
         protected sealed override void DisableInternal()
         {
             base.EnableInternal();
-            
+
             ApplyChangesInternal();
 
             UnityEngine.Object.DestroyImmediate(dataWrapper);
@@ -135,13 +139,14 @@ namespace OverrideEditors.Editor.Editors
                 var endProperty = dataProperty.GetEndProperty();
                 var nextProperty = dataProperty.Copy();
                 nextProperty.NextVisible(true);
-            
+
                 while (nextProperty.propertyPath != endProperty.propertyPath)
                 {
                     EditorGUILayout.PropertyField(nextProperty);
                     nextProperty.NextVisible(false);
                 }
             }
+
             return EditorGUI.EndChangeCheck();
         }
 

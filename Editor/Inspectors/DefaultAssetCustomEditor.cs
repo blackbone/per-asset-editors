@@ -8,6 +8,5 @@ namespace OverrideEditors.Editor.Inspectors
     {
         protected override Type DefaultEditorType
             => typeof(UnityEditor.Editor).Assembly.GetType("UnityEditor.DefaultAssetInspector");
-
     }
 }

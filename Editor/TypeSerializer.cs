@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using UnityEngine;
 
 namespace OverrideEditors.Editor
@@ -15,9 +14,7 @@ namespace OverrideEditors.Editor
                 return false;
             }
 
-            StringBuilder sb = null;
             bool result;
-            
             try
             {
                 var bytes = Convert.FromBase64String(data);
@@ -37,8 +34,8 @@ namespace OverrideEditors.Editor
                     if (TryGetType(br.ReadString(), out var genericType))
                         genericArguments[i] = genericType;
 
-                type = type.MakeGenericType(genericArguments);
-                
+                type = type?.MakeGenericType(genericArguments);
+
                 result = type != null;
             }
             catch (Exception e)
@@ -47,7 +44,7 @@ namespace OverrideEditors.Editor
                 type = null;
                 result = false;
             }
-            
+
             return result;
         }
 
@@ -72,6 +69,9 @@ namespace OverrideEditors.Editor
                 var genericArgumentsCount = genericArguments?.Length ?? 0;
 
                 bw.Write(genericArgumentsCount.ToString());
+                if (string.IsNullOrEmpty(type.AssemblyQualifiedName))
+                    throw new InvalidDataException($"Assembly qualified name for type {type} is null or empty!");
+
                 bw.Write(type.AssemblyQualifiedName);
 
                 if (genericArguments != null)

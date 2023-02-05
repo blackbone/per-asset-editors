@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace OverrideEditors.Editor.Editors
 {
-    public abstract class OverrideEditor<TAsset> : OverrideEditor where TAsset: Object
+    public abstract class OverrideEditor<TAsset> : OverrideEditor where TAsset : Object
     {
         protected TAsset Target => RawTarget as TAsset;
 
         protected sealed override void OnEnable()
         {
             base.OnEnable();
-            
+
             Assert.IsNotNull(Target);
             EnableInternal();
         }

@@ -7,8 +7,11 @@ namespace OverrideEditors.Editor.PropertyDrawers
     [CustomPropertyDrawer(typeof(AssetLinkConfiguration))]
     public sealed class AssetConfigurationPropertyDrawer : ConfigurationPropertyDrawer
     {
-        protected override float GetContentHeight() => EditorGUIUtility.singleLineHeight;
-        
+        protected override float GetContentHeight()
+        {
+            return EditorGUIUtility.singleLineHeight;
+        }
+
         protected override void OnGUI(Rect position, SerializedProperty property)
         {
             var assetProperty = property.FindPropertyRelative("asset");

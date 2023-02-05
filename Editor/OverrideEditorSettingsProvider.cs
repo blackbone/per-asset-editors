@@ -7,10 +7,15 @@ namespace OverrideEditors.Editor
     {
         private SerializedObject settingsSerializedObject;
 
-        private OverrideEditorSettingsProvider() : base($"ProjectSettings/{ObjectNames.NicifyVariableName(nameof(OverrideEditorSettings))}", SettingsScope.Project) { }
+        private OverrideEditorSettingsProvider() : base($"ProjectSettings/{ObjectNames.NicifyVariableName(nameof(OverrideEditorSettings))}", SettingsScope.Project)
+        {
+        }
 
         [SettingsProvider]
-        private static SettingsProvider Create() => new OverrideEditorSettingsProvider();
+        private static SettingsProvider Create()
+        {
+            return new OverrideEditorSettingsProvider();
+        }
 
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {

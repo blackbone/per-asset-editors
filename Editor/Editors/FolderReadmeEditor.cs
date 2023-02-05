@@ -1,6 +1,5 @@
 using System.IO;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -10,18 +9,21 @@ namespace OverrideEditors.Editor.Editors
     public sealed class FolderReadmeEditor : OverrideEditor<DefaultAsset>
     {
         private const string ReadmeFileName = "readme~";
-        private static readonly GUILayoutOption[] Options = {
+
+        private static readonly GUILayoutOption[] Options =
+        {
             GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)
         };
-        
-        private bool isFolder;
-        
-        private string readmePath;
-        private FileInfo readmeFileInfo;
+
         private bool existsPreviously;
-        private string readme;
-        private bool notSaved;
+
+        private bool isFolder;
         private long lastFileVersion;
+        private bool notSaved;
+        private string readme;
+        private FileInfo readmeFileInfo;
+
+        private string readmePath;
 
         protected override void EnableInternal()
         {
@@ -29,7 +31,7 @@ namespace OverrideEditors.Editor.Editors
 
             var folderPath = AssetDatabase.GetAssetPath(Target);
             isFolder = AssetDatabase.IsValidFolder(folderPath);
-            
+
             if (!isFolder)
                 return;
 
@@ -46,16 +48,16 @@ namespace OverrideEditors.Editor.Editors
         protected override void DisableInternal()
         {
             base.DisableInternal();
-            
+
             SaveIfNotSaved(true);
         }
 
         protected override bool OnInspectorGUIInternal()
         {
             readmeFileInfo.Refresh();
-            
+
             // check need update readme content
-            // if file newerly created
+            // if file just created
             if (!existsPreviously && readmeFileInfo.Exists)
             {
                 readme = File.ReadAllText(readmePath);
@@ -68,10 +70,10 @@ namespace OverrideEditors.Editor.Editors
                 readme = File.ReadAllText(readmePath);
                 lastFileVersion = new FileInfo(readmePath).LastWriteTime.Ticks;
             }
-            
+
             if (!EditorGUIUtility.editingTextField)
                 SaveIfNotSaved(false);
-            
+
             EditorGUILayout.BeginVertical(Options);
             var newReadme = EditorGUILayout.TextArea(readme, Options);
             EditorGUILayout.EndVertical();
@@ -101,7 +103,7 @@ namespace OverrideEditors.Editor.Editors
                 File.Delete(readmePath);
                 lastFileVersion = -1;
             }
-            
+
             existsPreviously = hasFileContents;
             notSaved = false;
         }
