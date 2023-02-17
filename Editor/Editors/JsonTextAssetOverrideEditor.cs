@@ -82,8 +82,7 @@ namespace OverrideEditors.Editor.Editors
         {
             base.ApplyChangesInternal();
 
-            if (serializedObject != null)
-                serializedObject.ApplyModifiedProperties();
+            serializedObject?.ApplyModifiedProperties();
 
             if (dataWrapper == null)
                 return;
@@ -148,12 +147,6 @@ namespace OverrideEditors.Editor.Editors
             }
 
             return EditorGUI.EndChangeCheck();
-        }
-
-        [Serializable]
-        public abstract class GenericDataWrapperScriptableObject<T> : ScriptableObject
-        {
-            [SerializeField] internal T data;
         }
     }
 }
